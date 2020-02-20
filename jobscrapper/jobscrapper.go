@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/samnoh/job_scrapper/helpers"
+	"github.com/samnoh/go-indeed-webscraper/helpers"
 )
 
 type extractedJob struct {
