@@ -2,7 +2,6 @@ package indeed
 
 import (
 	"encoding/csv"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -121,6 +120,5 @@ func Scrap(keyword string) {
 		jobs = append(jobs, jobsPerPage...)
 	}
 
-	fmt.Println(jobs)
 	writeJobs(jobs)
 }

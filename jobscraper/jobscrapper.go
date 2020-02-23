@@ -1,9 +1,9 @@
-package jobscrapper
+package jobscraper
 
 import (
 	"log"
 
-	"github.com/samnoh/go-indeed-webscraper/jobscrapper/indeed"
+	"github.com/samnoh/go-indeed-webscraper/jobscraper/indeed"
 )
 
 var jobWebsites = map[string]int{

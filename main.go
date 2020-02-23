@@ -1,7 +1,12 @@
 package main
 
-import "github.com/samnoh/go-indeed-webscraper/jobscrapper"
+import (
+	"github.com/labstack/echo"
+	"github.com/samnoh/go-indeed-webscraper/controllers"
+)
 
 func main() {
-	jobscrapper.Start("indeed", "javascript")
+	e := echo.New()
+	controllers.Controllers(e)
+	e.Logger.Fatal(e.Start(":3000"))
 }

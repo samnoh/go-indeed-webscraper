@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Scraper</title>
+</head>
+
+<body>
+    <h1>Job Scraper</h1>
+    <form method="POST" action="/scrap-job" id="keyword-form" onsubmit="clearForm()">
+        <input type="text" placeholder="Keyword" name="keyword" autofocus />
+        <button type="submit">Search</button>
+    </form>
+
+    <script>
+        function clearForm() {
+            setTimeout(() => {
+                document.querySelector('#keyword-form').reset();
+            }, 0)
+        }
+    </script>
+</body>
+
+</html>
