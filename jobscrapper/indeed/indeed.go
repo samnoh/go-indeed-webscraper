@@ -2,6 +2,7 @@ package indeed
 
 import (
 	"encoding/csv"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,14 +21,14 @@ type extractedJob struct {
 
 var baseURL string = "https://nz.indeed.com/jobs?limit=50&q="
 
-func extractJob(card *goquery.Selection) extractedJob {
+func extractJob(card *goquery.Selection, c chan<- extractedJob) {
 	id, _ := card.Attr("data-jk")
 	title := helpers.CleanString(card.Find(".title>a").Text())
 	location := helpers.CleanString(card.Find(".sjcl").Text())
 	salary := helpers.CleanString(card.Find(".salaryText").Text())
 	description := helpers.CleanString(card.Find(".summary").Text())
 
-	return extractedJob{
+	c <- extractedJob{
 		id:          id,
 		title:       title,
 		location:    location,
@@ -56,7 +57,7 @@ func getNumberOfPages() int {
 	return nPages
 }
 
-func getPage(page int) []extractedJob {
+func getPage(page int, scrapC chan<- []extractedJob) {
 	pageURL := baseURL + "&start=" + strconv.Itoa(page*50)
 	res, err := http.Get(pageURL)
 
@@ -69,12 +70,19 @@ func getPage(page int) []extractedJob {
 	helpers.CheckErr(err)
 
 	var jobs []extractedJob
-	doc.Find(".jobsearch-SerpJobCard").Each(func(i int, card *goquery.Selection) {
-		job := extractJob(card)
-		jobs = append(jobs, job)
+	c := make(chan extractedJob)
+
+	searchCards := doc.Find(".jobsearch-SerpJobCard")
+	searchCards.Each(func(i int, card *goquery.Selection) {
+		go extractJob(card, c)
 	})
 
-	return jobs
+	for i := 0; i < searchCards.Length(); i++ {
+		job := <-c
+		jobs = append(jobs, job)
+	}
+
+	scrapC <- jobs
 }
 
 func writeJobs(jobs []extractedJob) {
@@ -103,9 +111,16 @@ func Scrap(keyword string) {
 	var jobs []extractedJob
 
 	totalNumberOfPages := getNumberOfPages()
+	c := make(chan []extractedJob)
 	for i := 0; i < totalNumberOfPages; i++ {
-		jobs = append(jobs, getPage(i)...)
+		go getPage(i, c)
 	}
 
+	for i := 0; i < totalNumberOfPages; i++ {
+		jobsPerPage := <-c
+		jobs = append(jobs, jobsPerPage...)
+	}
+
+	fmt.Println(jobs)
 	writeJobs(jobs)
 }
