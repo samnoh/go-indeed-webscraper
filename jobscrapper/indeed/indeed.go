@@ -2,7 +2,6 @@ package indeed
 
 import (
 	"encoding/csv"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -37,7 +36,7 @@ func extractJob(card *goquery.Selection) extractedJob {
 	}
 }
 
-func getPages() int {
+func getNumberOfPages() int {
 	res, err := http.Get(baseURL)
 
 	helpers.CheckErr(err)
@@ -101,14 +100,12 @@ func writeJobs(jobs []extractedJob) {
 
 func Scrap(keyword string) {
 	baseURL = baseURL + keyword
-
 	var jobs []extractedJob
-	totalPages := getPages()
 
-	for i := 0; i < totalPages; i++ {
+	totalNumberOfPages := getNumberOfPages()
+	for i := 0; i < totalNumberOfPages; i++ {
 		jobs = append(jobs, getPage(i)...)
 	}
 
-	fmt.Println(jobs)
 	writeJobs(jobs)
 }
